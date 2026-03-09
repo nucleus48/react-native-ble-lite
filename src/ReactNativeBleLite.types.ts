@@ -1,19 +1,14 @@
-import type { StyleProp, ViewStyle } from 'react-native';
+export interface EventSubscription {
+  remove(): void;
+}
 
-export type OnLoadEventPayload = {
-  url: string;
-};
+export interface AdvertisementEvent {
+  uuid: string;
+  data: string;
+  rssi: number;
+  deviceId: string;
+}
 
 export type ReactNativeBleLiteModuleEvents = {
-  onChange: (params: ChangeEventPayload) => void;
-};
-
-export type ChangeEventPayload = {
-  value: string;
-};
-
-export type ReactNativeBleLiteViewProps = {
-  url: string;
-  onLoad: (event: { nativeEvent: OnLoadEventPayload }) => void;
-  style?: StyleProp<ViewStyle>;
+  onAdvertisement: (event: AdvertisementEvent) => void;
 };

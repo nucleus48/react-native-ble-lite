@@ -1,50 +1,135 @@
 package expo.modules.blelite
 
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
+import android.bluetooth.le.*
+import android.content.Context
+import android.os.ParcelUuid
+import expo.modules.kotlin.exception.Exceptions
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
-import java.net.URL
+import java.util.*
 
 class ReactNativeBleLiteModule : Module() {
-  // Each module class must implement the definition function. The definition consists of components
-  // that describes the module's functionality and behavior.
-  // See https://docs.expo.dev/modules/module-api for more details about available components.
+  private val context: Context
+    get() = appContext.reactContext ?: throw Exceptions.AppContextLost()
+
+  private val bluetoothManager: BluetoothManager
+    get() = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+
+  private val bluetoothAdapter: BluetoothAdapter?
+    get() = bluetoothManager.adapter
+
+  private var scanCallback: ScanCallback? = null
+  private var advertiseCallback: AdvertiseCallback? = null
+
   override fun definition() = ModuleDefinition {
-    // Sets the name of the module that JavaScript code will use to refer to the module. Takes a string as an argument.
-    // Can be inferred from module's class name, but it's recommended to set it explicitly for clarity.
-    // The module will be accessible from `requireNativeModule('ReactNativeBleLite')` in JavaScript.
     Name("ReactNativeBleLite")
 
-    // Defines constant property on the module.
-    Constant("PI") {
-      Math.PI
-    }
+    Events("onAdvertisement")
 
-    // Defines event names that the module can send to JavaScript.
-    Events("onChange")
+    AsyncFunction("startScanning") { serviceUuid: String ->
+      val scanner = bluetoothAdapter?.bluetoothLeScanner ?: return@AsyncFunction
+      
+      stopScanningInternal()
 
-    // Defines a JavaScript synchronous function that runs the native code on the JavaScript thread.
-    Function("hello") {
-      "Hello world! 👋"
-    }
+      val filter = ScanFilter.Builder()
+        .setServiceUuid(ParcelUuid(UUID.fromString(serviceUuid)))
+        .build()
 
-    // Defines a JavaScript function that always returns a Promise and whose native code
-    // is by default dispatched on the different thread than the JavaScript runtime runs on.
-    AsyncFunction("setValueAsync") { value: String ->
-      // Send an event to JavaScript.
-      sendEvent("onChange", mapOf(
-        "value" to value
-      ))
-    }
+      val settings = ScanSettings.Builder()
+        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+        .build()
 
-    // Enables the module to be used as a native view. Definition components that are accepted as part of
-    // the view definition: Prop, Events.
-    View(ReactNativeBleLiteView::class) {
-      // Defines a setter for the `url` prop.
-      Prop("url") { view: ReactNativeBleLiteView, url: URL ->
-        view.webView.loadUrl(url.toString())
+      scanCallback = object : ScanCallback() {
+        override fun onScanResult(callbackType: Int, result: ScanResult) {
+          val device = result.device
+          val scanRecord = result.scanRecord ?: return
+          val serviceData = scanRecord.serviceData[ParcelUuid(UUID.fromString(serviceUuid))] ?: byteArrayOf()
+          
+          sendEvent("onAdvertisement", mapOf(
+            "uuid" to serviceUuid,
+            "data" to serviceData.toHexString(),
+            "rssi" to result.rssi,
+            "deviceId" to device.address
+          ))
+        }
+
+        override fun onScanFailed(errorCode: Int) {
+          // TODO: handle scan failure?
+        }
       }
-      // Defines an event that the view can send to JavaScript.
-      Events("onLoad")
+
+      scanner.startScan(listOf(filter), settings, scanCallback)
     }
+
+    AsyncFunction("stopScanning") {
+      stopScanningInternal()
+    }
+
+    AsyncFunction("startAdvertising") { serviceUuid: String, data: String ->
+      val advertiser = bluetoothAdapter?.bluetoothLeAdvertiser ?: return@AsyncFunction
+      
+      stopAdvertisingInternal()
+
+      val uuid = UUID.fromString(serviceUuid)
+      val dataBytes = data.decodeHex()
+
+      val settings = AdvertiseSettings.Builder()
+        .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
+        .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_HIGH)
+        .setConnectable(false)
+        .build()
+
+      val advertiseData = AdvertiseData.Builder()
+        .addServiceUuid(ParcelUuid(uuid))
+        .addServiceData(ParcelUuid(uuid), dataBytes)
+        .setIncludeDeviceName(false)
+        .setIncludeTxPowerLevel(false)
+        .build()
+
+      advertiseCallback = object : AdvertiseCallback() {
+        override fun onStartSuccess(settingsInEffect: AdvertiseSettings) {
+          super.onStartSuccess(settingsInEffect)
+        }
+
+        override fun onStartFailure(errorCode: Int) {
+          super.onStartFailure(errorCode)
+        }
+      }
+
+      advertiser.startAdvertising(settings, advertiseData, advertiseCallback)
+    }
+
+    AsyncFunction("stopAdvertising") {
+      stopAdvertisingInternal()
+    }
+  }
+
+  private fun stopScanningInternal() {
+    val scanner = bluetoothAdapter?.bluetoothLeScanner
+    scanCallback?.let {
+      scanner?.stopScan(it)
+      scanCallback = null
+    }
+  }
+
+  private fun stopAdvertisingInternal() {
+    val advertiser = bluetoothAdapter?.bluetoothLeAdvertiser
+    advertiseCallback?.let {
+      advertiser?.stopAdvertising(it)
+      advertiseCallback = null
+    }
+  }
+
+  private fun ByteArray.toHexString(): String {
+    return joinToString("") { "%02x".format(it) }
+  }
+
+  private fun String.decodeHex(): ByteArray {
+    check(length % 2 == 0) { "Must have an even length" }
+    return chunked(2)
+      .map { it.toInt(16).toByte() }
+      .toByteArray()
   }
 }
