@@ -1,0 +1,10 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "react-native-ble-lite": ["../src/index"],
+      "react-native-ble-lite/*": ["../src/*"]
+    }
+  }
+}

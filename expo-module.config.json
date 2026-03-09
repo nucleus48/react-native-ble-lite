@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android", "web"],
+  "apple": {
+    "modules": ["ReactNativeBleLiteModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.blelite.ReactNativeBleLiteModule"]
+  }
+}
