@@ -28,11 +28,11 @@
   "author": "nucleus48 <nucleuserumagborie@gmail.com> (nucleus48)",
   "license": "MIT",
   "homepage": "https://github.com/nucleus48/react-native-ble-lite#readme",
-  "dependencies": {},
   "devDependencies": {
+    "@expo/npm-proofread": "^1.0.1",
     "@types/react": "~19.1.1",
-    "expo-module-scripts": "^55.0.2",
     "expo": "^55.0.5",
+    "expo-module-scripts": "^55.0.2",
     "react-native": "0.82.1"
   },
   "peerDependencies": {
