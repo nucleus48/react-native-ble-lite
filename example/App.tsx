@@ -1,5 +1,5 @@
 import { useEvent } from "expo";
-import ReactNativeBleLite from "react-native-ble-lite";
+import * as BLE from "react-native-ble-lite";
 import {
   Button,
   SafeAreaView,
@@ -8,6 +8,7 @@ import {
   View,
   StyleSheet,
   TextInput,
+  Switch,
 } from "react-native";
 import { useState } from "react";
 
@@ -19,41 +20,57 @@ export default function App() {
   const [data, setData] = useState(DEFAULT_DATA);
   const [isScanning, setIsScanning] = useState(false);
   const [isAdvertising, setIsAdvertising] = useState(false);
+  const [allowDuplicates, setAllowDuplicates] = useState(true);
 
-  const lastAdvertisement = useEvent(ReactNativeBleLite, "onAdvertisement");
+  // Use the module object directly for events or use the convenience exports
+  const lastAdvertisement = useEvent(
+    BLE.ReactNativeBleLiteModule,
+    "onAdvertisement",
+  );
 
-  const startScanning = async () => {
+  const handleStartScanning = async () => {
     try {
-      await ReactNativeBleLite.startScanning(uuid);
+      await BLE.startScanning({
+        serviceUuid: uuid,
+        scanMode: BLE.ScanMode.LOW_LATENCY,
+        allowDuplicates: allowDuplicates,
+      });
       setIsScanning(true);
-    } catch (e) {
-      console.error(e);
+    } catch (e: any) {
+      console.error("Scan Error:", e.message);
+      alert(`Scan failed: ${e.message}`);
     }
   };
 
-  const stopScanning = async () => {
+  const handleStopScanning = async () => {
     try {
-      await ReactNativeBleLite.stopScanning();
+      await BLE.stopScanning();
       setIsScanning(false);
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
     }
   };
 
-  const startAdvertising = async () => {
+  const handleStartAdvertising = async () => {
     try {
-      await ReactNativeBleLite.startAdvertising(uuid, data);
+      await BLE.startAdvertising({
+        serviceUuid: uuid,
+        data: data,
+        powerLevel: BLE.AdvertisePower.HIGH,
+        advertiseMode: BLE.AdvertiseMode.LOW_LATENCY,
+      });
       setIsAdvertising(true);
-    } catch (e) {
-      console.error(e);
+    } catch (e: any) {
+      console.error("Advertise Error:", e.message);
+      alert(`Advertising failed: ${e.message}`);
     }
   };
 
-  const stopAdvertising = async () => {
+  const handleStopAdvertising = async () => {
     try {
-      await ReactNativeBleLite.stopAdvertising();
+      await BLE.stopAdvertising();
       setIsAdvertising(false);
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
     }
   };
@@ -61,7 +78,7 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.header}>BLE Lite</Text>
+        <Text style={styles.header}>BLE Lite Configurable</Text>
 
         <Group name="Configuration">
           <Text style={styles.label}>Service UUID:</Text>
@@ -69,51 +86,79 @@ export default function App() {
             style={styles.input}
             value={uuid}
             onChangeText={setUuid}
-            placeholder="UUID"
+            placeholder="UUID (e.g. 1234...)"
           />
           <Text style={styles.label}>Service Data (Hex):</Text>
           <TextInput
             style={styles.input}
             value={data}
             onChangeText={setData}
-            placeholder="Hex Data"
+            placeholder="Hex Data (e.g. deadbeef)"
           />
-        </Group>
 
-        <Group name="Actions">
-          <View style={styles.buttonRow}>
-            <Button
-              title={isScanning ? "Stop Scanning" : "Start Scanning"}
-              onPress={isScanning ? stopScanning : startScanning}
-              color={isScanning ? "red" : "blue"}
-            />
-            <Button
-              title={isAdvertising ? "Stop Advertising" : "Start Advertising"}
-              onPress={isAdvertising ? stopAdvertising : startAdvertising}
-              color={isAdvertising ? "red" : "blue"}
+          <View style={styles.switchRow}>
+            <Text style={styles.label}>Allow Duplicates (iOS):</Text>
+            <Switch
+              value={allowDuplicates}
+              onValueChange={setAllowDuplicates}
             />
           </View>
         </Group>
 
-        <Group name="Last Advertisement Seen">
+        <Group name="Actions">
+          <View style={styles.buttonCol}>
+            <View style={styles.buttonSpacing}>
+              <Button
+                title={
+                  isScanning ? "Stop Scanning" : "Start Scanning (Low Latency)"
+                }
+                onPress={isScanning ? handleStopScanning : handleStartScanning}
+                color={isScanning ? "#ff4444" : "#2196F3"}
+              />
+            </View>
+            <View style={styles.buttonSpacing}>
+              <Button
+                title={
+                  isAdvertising
+                    ? "Stop Advertising"
+                    : "Start Advertising (High Power)"
+                }
+                onPress={
+                  isAdvertising ? handleStopAdvertising : handleStartAdvertising
+                }
+                color={isAdvertising ? "#ff4444" : "#4CAF50"}
+              />
+            </View>
+          </View>
+        </Group>
+
+        <Group name="Live Feed">
           {lastAdvertisement ? (
-            <View>
-              <Text>
+            <View style={styles.eventContainer}>
+              <Text style={styles.dataPoint}>
                 <Text style={styles.bold}>Device ID:</Text>{" "}
                 {lastAdvertisement.deviceId}
               </Text>
-              <Text>
-                <Text style={styles.bold}>RSSI:</Text> {lastAdvertisement.rssi}
+              <Text style={styles.dataPoint}>
+                <Text style={styles.bold}>RSSI:</Text> {lastAdvertisement.rssi}{" "}
+                dBm
               </Text>
-              <Text>
+              <Text style={styles.dataPoint}>
                 <Text style={styles.bold}>Data:</Text>{" "}
                 {lastAdvertisement.data || "(None)"}
               </Text>
+              <Text style={styles.timestamp}>
+                Last seen: {new Date().toLocaleTimeString()}
+              </Text>
             </View>
           ) : (
-            <Text>No advertisements seen yet.</Text>
+            <Text style={styles.placeholder}>No advertisements detected.</Text>
           )}
         </Group>
+
+        <Text style={styles.footer}>
+          Note: Ensure Bluetooth permissions are granted in the host app.
+        </Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -129,55 +174,102 @@ function Group(props: { name: string; children: React.ReactNode }) {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    fontSize: 32,
-    fontWeight: "bold",
-    margin: 20,
-    textAlign: "center",
-  },
-  groupHeader: {
-    fontSize: 20,
-    fontWeight: "600",
-    marginBottom: 15,
-    color: "#333",
-  },
-  group: {
-    marginHorizontal: 20,
-    marginVertical: 10,
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
   container: {
     flex: 1,
-    backgroundColor: "#f7f7f7",
+    backgroundColor: "#f0f2f5",
   },
   scrollContent: {
     paddingBottom: 40,
   },
+  header: {
+    fontSize: 28,
+    fontWeight: "800",
+    marginVertical: 30,
+    marginHorizontal: 20,
+    color: "#1a1a1a",
+    letterSpacing: -0.5,
+  },
+  group: {
+    marginHorizontal: 20,
+    marginBottom: 20,
+    backgroundColor: "#ffffff",
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 2,
+  },
+  groupHeader: {
+    fontSize: 18,
+    fontWeight: "700",
+    marginBottom: 18,
+    color: "#333",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+  },
   label: {
-    fontSize: 14,
+    fontSize: 13,
+    fontWeight: "600",
     color: "#666",
-    marginBottom: 5,
+    marginBottom: 6,
   },
   input: {
+    backgroundColor: "#f8f9fa",
     borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 15,
-    fontSize: 14,
+    borderColor: "#e9ecef",
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 16,
+    fontSize: 15,
+    color: "#333",
   },
-  buttonRow: {
+  switchRow: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 5,
+  },
+  buttonCol: {
+    flexDirection: "column",
+  },
+  buttonSpacing: {
+    marginVertical: 6,
+  },
+  eventContainer: {
+    backgroundColor: "#fff4e5",
+    padding: 15,
+    borderRadius: 10,
+    borderLeftWidth: 4,
+    borderLeftColor: "#ffa94d",
+  },
+  dataPoint: {
+    fontSize: 15,
+    marginBottom: 4,
+    color: "#444",
+  },
+  timestamp: {
+    fontSize: 11,
+    color: "#999",
+    marginTop: 8,
+    fontStyle: "italic",
+  },
+  placeholder: {
+    color: "#999",
+    fontStyle: "italic",
+    textAlign: "center",
+    padding: 10,
   },
   bold: {
-    fontWeight: "bold",
+    fontWeight: "700",
+    color: "#111",
+  },
+  footer: {
+    textAlign: "center",
+    color: "#888",
+    fontSize: 12,
+    marginTop: 10,
+    paddingHorizontal: 40,
   },
 });

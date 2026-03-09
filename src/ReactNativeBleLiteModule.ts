@@ -1,10 +1,31 @@
 import { NativeModule, requireNativeModule } from "expo";
-import { ReactNativeBleLiteModuleEvents } from "./ReactNativeBleLite.types";
+import {
+  AdvertiseOptions,
+  ReactNativeBleLiteModuleEvents,
+  ScanOptions,
+} from "./ReactNativeBleLite.types";
 
 declare class ReactNativeBleLiteModule extends NativeModule<ReactNativeBleLiteModuleEvents> {
-  startAdvertising(serviceUuid: string, data: string): Promise<void>;
+  /**
+   * Starts advertising with the provided configuration.
+   * @param options Configuration for advertising.
+   */
+  startAdvertising(options: AdvertiseOptions): Promise<void>;
+
+  /**
+   * Stops the current advertising session.
+   */
   stopAdvertising(): Promise<void>;
-  startScanning(serviceUuid: string): Promise<void>;
+
+  /**
+   * Starts scanning for BLE devices with the provided configuration.
+   * @param options Configuration for scanning.
+   */
+  startScanning(options: ScanOptions): Promise<void>;
+
+  /**
+   * Stops the current scanning session.
+   */
   stopScanning(): Promise<void>;
 }
 
