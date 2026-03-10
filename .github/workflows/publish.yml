@@ -1,4 +1,4 @@
-name: Release
+name: Publish Package
 on:
   push:
     branches:
@@ -11,26 +11,26 @@ permissions:
   id-token: write # to enable use of OIDC for npm provenance
 
 jobs:
-  release:
-    name: Release
+  publish:
+    name: publish
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Install pnpm
+      - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "lts/*"
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install
@@ -39,10 +39,9 @@ jobs:
         run: pnpm run build
 
       - name: Release
+        uses: cycjimmy/semantic-release-action@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        uses: cycjimmy/semantic-release-action@v6
         with:
           extra_plugins: |
             @semantic-release/commit-analyzer
