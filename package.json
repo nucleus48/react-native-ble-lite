@@ -26,7 +26,7 @@
     "url": "https://github.com/nucleus48/react-native-ble-lite/issues"
   },
   "author": "nucleus48 <nucleuserumagborie@gmail.com> (nucleus48)",
-  "license": "MIT",
+  "license": "ISC",
   "homepage": "https://github.com/nucleus48/react-native-ble-lite#readme",
   "devDependencies": {
     "@expo/npm-proofread": "^1.0.1",

@@ -1,5 +1,10 @@
 # react-native-ble-lite
 
+[![npm version](https://img.shields.io/npm/v/react-native-ble-lite.svg?style=flat-square)](https://www.npmjs.com/package/react-native-ble-lite)
+[![npm downloads](https://img.shields.io/npm/dm/react-native-ble-lite.svg?style=flat-square)](https://www.npmjs.com/package/react-native-ble-lite)
+[![license](https://img.shields.io/npm/l/react-native-ble-lite.svg?style=flat-square)](https://github.com/nucleus48/react-native-ble-lite/blob/main/LICENSE)
+[![platform](https://img.shields.io/badge/platforms-android%20|%20ios%20|%20expo-lightgrey.svg?style=flat-square)](https://github.com/nucleus48/react-native-ble-lite)
+
 A lightweight, high-performance Bluetooth Low Energy (BLE) library for React Native and Expo. Focused on core **Central (Scanning)** and **Peripheral (Advertising)** capabilities with a clean, strongly-typed API.
 
 Built using the [Expo Module API](https://docs.expo.dev/modules/overview/) for maximum performance and stability.
@@ -226,4 +231,8 @@ Adds a global listener for detected advertisements. Returns a subscription objec
 
 ## License
 
-MIT
+ISC
+
+---
+
+**Tags**: `react-native`, `expo-module`, `bluetooth-low-energy`, `ble`, `central`, `peripheral`, `advertising`, `scanning`, `ios`, `android`, `typescript`
