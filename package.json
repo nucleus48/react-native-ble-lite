@@ -37,7 +37,7 @@
     "expo": "^55.0.5",
     "expo-module-scripts": "^55.0.2",
     "expo-modules-core": "^55.0.14",
-    "react-native": "0.82.1",
+    "react-native": "0.84.1",
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
