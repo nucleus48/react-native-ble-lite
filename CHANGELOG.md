@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/nucleus48/react-native-ble-lite/compare/v1.0.0...v1.1.0) (2026-03-11)
+
+
+### Features
+
+* Add Expo Config Plugin to automate Bluetooth permission configuration for iOS and Android. ([b6202bd](https://github.com/nucleus48/react-native-ble-lite/commit/b6202bd0be8d467dc83fafc9c2d46821fd463a68))
+
 # 1.0.0 (2026-03-11)
 
 
