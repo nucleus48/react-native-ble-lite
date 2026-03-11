@@ -3,14 +3,24 @@ plugins {
   id 'expo-module-gradle-plugin'
 }
 
+import groovy.json.JsonSlurper
+
+def getPackageJson() {
+  def inputFile = new File(projectDir, "../package.json")
+  def packageJson = new JsonSlurper().parseText(inputFile.text)
+  return packageJson
+}
+
+def packageJson = getPackageJson()
+
 group = 'expo.modules.blelite'
-version = '0.1.0'
+version = packageJson.version
 
 android {
   namespace "expo.modules.blelite"
   defaultConfig {
     versionCode 1
-    versionName "0.1.0"
+    versionName packageJson.version
   }
   lintOptions {
     abortOnError false

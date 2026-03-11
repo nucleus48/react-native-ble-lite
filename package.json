@@ -18,14 +18,27 @@
   "keywords": [
     "react-native",
     "expo",
-    "react-native-ble-lite",
-    "ReactNativeBleLite"
+    "expo-module",
+    "bluetooth",
+    "ble",
+    "bluetooth-low-energy",
+    "central",
+    "peripheral",
+    "advertising",
+    "scanning",
+    "ios",
+    "android",
+    "typescript"
   ],
-  "repository": "https://github.com/nucleus48/react-native-ble-lite",
-  "bugs": {
-    "url": "https://github.com/nucleus48/react-native-ble-lite/issues"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nucleus48/react-native-ble-lite.git"
   },
-  "author": "nucleus48 <nucleuserumagborie@gmail.com> (nucleus48)",
+  "bugs": {
+    "url": "https://github.com/nucleus48/react-native-ble-lite/issues",
+    "email": "nucleuserumagborie@gmail.com"
+  },
+  "author": "nucleus48 <nucleuserumagborie@gmail.com>",
   "license": "ISC",
   "homepage": "https://github.com/nucleus48/react-native-ble-lite#readme",
   "devDependencies": {
