@@ -1,7 +1,7 @@
 {
   "name": "react-native-ble-lite",
   "version": "1.1.0",
-  "description": "Basic BLE central and peripheral functionality",
+  "description": "High-performance, lightweight Bluetooth Low Energy (BLE) library for React Native and Expo. Supports Central scanning and Peripheral advertising with a strongly-typed API.",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {

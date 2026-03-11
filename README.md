@@ -265,7 +265,3 @@ Adds a global listener for detected advertisements. Returns a subscription objec
 ## License
 
 ISC
-
----
-
-**Tags**: `react-native`, `expo-module`, `bluetooth-low-energy`, `ble`, `central`, `peripheral`, `advertising`, `scanning`, `ios`, `android`, `typescript`
