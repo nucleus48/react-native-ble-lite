@@ -27,6 +27,15 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "../app.plugin.js",
+        {
+          "bluetoothAlwaysPermission": "Scanning for BLE devices is required for this app to function",
+          "bluetoothPeripheralPermission": "Discovering BLE devices is required for this app to function"
+        }
+      ]
+    ]
   }
 }

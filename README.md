@@ -37,11 +37,42 @@ _Note: This package requires `expo-modules` to be installed in your project._
 
 ---
 
+## Expo Config Plugin
+
+For Expo developers using [Continuous Native Generation (CNG)](https://docs.expo.dev/workflow/continuous-native-generation/), this library includes a config plugin to automatically configure native projects.
+
+Add the plugin to your `app.json` or `app.config.js`:
+
+```json
+{
+  "expo": {
+    "plugins": [
+      [
+        "react-native-ble-lite",
+        {
+          "bluetoothAlwaysPermission": "Allow $(PRODUCT_NAME) to connect to bluetooth devices",
+          "bluetoothPeripheralPermission": "Allow $(PRODUCT_NAME) to discover and connect to bluetooth devices"
+        }
+      ]
+    ]
+  }
+}
+```
+
+### Config Plugin Options
+
+| Property                        | Type     | Default                                                                | Description                                           |
+| :------------------------------ | :------- | :--------------------------------------------------------------------- | :---------------------------------------------------- |
+| `bluetoothAlwaysPermission`     | `string` | `"Allow $(PRODUCT_NAME) to connect to bluetooth devices"`              | iOS: `NSBluetoothAlwaysUsageDescription` message.     |
+| `bluetoothPeripheralPermission` | `string` | `"Allow $(PRODUCT_NAME) to discover and connect to bluetooth devices"` | iOS: `NSBluetoothPeripheralUsageDescription` message. |
+
+---
+
 ## Platform Setup
 
 ### iOS
 
-Add the following keys to your `Info.plist` (or `app.json` if using Expo):
+If you are **not** using the Expo Config Plugin, add the following keys to your `Info.plist`:
 
 ```xml
 <key>NSBluetoothAlwaysUsageDescription</key>
@@ -52,8 +83,10 @@ Add the following keys to your `Info.plist` (or `app.json` if using Expo):
 
 ### Android
 
-Permissions are handled by the library, but you should ensure they are included in your `AndroidManifest.xml` (the library provides them by default via the manifest merger):
+The library automatically adds the required permissions to your `AndroidManifest.xml` via manifest merger. No manual steps are required for standard projects. The permissions included are:
 
+- `android.permission.BLUETOOTH`
+- `android.permission.BLUETOOTH_ADMIN`
 - `android.permission.BLUETOOTH_SCAN`
 - `android.permission.BLUETOOTH_ADVERTISE`
 - `android.permission.BLUETOOTH_CONNECT`

@@ -42,10 +42,12 @@
   "license": "ISC",
   "homepage": "https://github.com/nucleus48/react-native-ble-lite#readme",
   "devDependencies": {
+    "@expo/config-plugins": "^55.0.6",
     "@expo/npm-proofread": "^1.0.1",
     "@types/react": "~19.1.1",
     "expo": "^55.0.5",
     "expo-module-scripts": "^55.0.2",
+    "expo-modules-core": "^55.0.14",
     "react-native": "0.82.1",
     "typescript": "^5.9.3"
   },
