@@ -1,6 +1,6 @@
 {
   "name": "react-native-ble-lite",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Basic BLE central and peripheral functionality",
   "main": "build/index.js",
   "types": "build/index.d.ts",
