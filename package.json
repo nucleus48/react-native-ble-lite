@@ -33,7 +33,7 @@
   "devDependencies": {
     "@expo/config-plugins": "^55.0.6",
     "@expo/npm-proofread": "^1.0.1",
-    "@types/react": "~19.1.1",
+    "@types/react": "~19.2.0",
     "expo": "^55.0.5",
     "expo-module-scripts": "^55.0.2",
     "expo-modules-core": "^55.0.14",
